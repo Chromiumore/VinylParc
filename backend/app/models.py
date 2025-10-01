@@ -23,16 +23,16 @@ class Base(DeclarativeBase):
 musician_ensemble = Table(
     'musician_ensemble',
     Base.metadata,
-    Column('musician_id', ForeignKey('musicians.id')),
-    Column('ensemble_id', ForeignKey('ensembles.id')),
+    Column('musician_id', ForeignKey('musicians.id', ondelete='cascade')),
+    Column('ensemble_id', ForeignKey('ensembles.id', ondelete='cascade')),
 )
 
 
 performance_record = Table(
     'performance_record',
     Base.metadata,
-    Column('performance_id', ForeignKey('performances.id')),
-    Column('record_id', ForeignKey('records.id')),
+    Column('performance_id', ForeignKey('performances.id', ondelete='cascade')),
+    Column('record_id', ForeignKey('records.id', ondelete='cascade')),
 )
 
 
@@ -84,9 +84,9 @@ class Performance(Base):
 
     performance_date: Mapped[date] = mapped_column(Date)
     
-    composition_id: Mapped[int] = mapped_column(ForeignKey('compositions.id'))
+    composition_id: Mapped[int] = mapped_column(ForeignKey('compositions.id', ondelete='cascade'))
     composition: Mapped[Composition] = relationship()
-    ensemble_id: Mapped[int] = mapped_column(ForeignKey('ensembles.id'))
+    ensemble_id: Mapped[int] = mapped_column(ForeignKey('ensembles.id', ondelete='cascade'))
     ensemble: Mapped[Ensemble] = relationship()
 
 
