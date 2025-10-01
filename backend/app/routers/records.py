@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from ..database import db_helper
-from ..models import Record
+from ..models import Record, Performance
 from ..schemas import RecordSchema
 
 
@@ -24,6 +24,7 @@ def get_record(id: int):
 @router.post('/records/', status_code=201)
 def add_record(record_data: RecordSchema):
     with db_helper.session_maker() as session:
+        performances = session.query(Performance).filter(Performance.id.in_(record_data.performances_id)).all()
         record = Record(
             company=record_data.company,
             wholesale_company_address=record_data.wholesale_company_address,
@@ -33,6 +34,7 @@ def add_record(record_data: RecordSchema):
             current_year_sold=record_data.current_year_sold,
             last_year_sold=record_data.last_year_sold,
             remaining_stock=record_data.remaining_stock,
+            performances=performances
         )
         session.add(record)
         session.commit()
@@ -42,9 +44,11 @@ def add_record(record_data: RecordSchema):
 @router.put('/records/{id}')
 def update_record(id: int, record_data: RecordSchema):
     with db_helper.session_maker() as session:
+        performances = session.query(Performance).filter(Performance.id.in_(record_data.performances_id)).all()
         record = session.query(Record).filter_by(id=id).first()
         for key, value in record_data.model_dump().items():
-            setattr(record, key, value)
+            if key != 'performances_id': setattr(record, key, value)
+        record.performances = performances
         session.commit()
         session.refresh(record)
         return record

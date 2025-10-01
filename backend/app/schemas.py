@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 from pydantic import BaseModel
 from .models import MusicianType, EnsembleType
@@ -16,6 +16,8 @@ class RecordSchema(BaseModel):
     last_year_sold: int
     remaining_stock: int
 
+    performances_id: List[int]
+
 
 class CompositionSchema(BaseModel):
     name: str
@@ -32,6 +34,8 @@ class EnsembleSchema(BaseModel):
     name: str
     about: Optional[str]
     ensemble_type: EnsembleType
+
+    musicians_id: List[int]
 
 
 class PerformanceSchema(BaseModel):
