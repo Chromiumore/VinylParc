@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from .database import db_helper
-from .models import Record
-from .schemas import RecordSchema
+from ..database import db_helper
+from ..models import Record
+from ..schemas import RecordSchema
 
 router = APIRouter()
 
