@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from ..database import db_helper
-from ..models import Ensemble
+from ..models import Ensemble, Musician
 from ..schemas import EnsembleSchema
 
 
@@ -24,10 +24,12 @@ def get_ensemble(id: int):
 @router.post('/ensembles/', status_code=201)
 def add_ensemble(ensemble_data: EnsembleSchema):
     with db_helper.session_maker() as session:
+        musicians = session.query(Musician).filter(Musician.id.in_(ensemble_data.musicians_id)).all()
         ensemble = Ensemble(
             name=ensemble_data.name,
             about=ensemble_data.about,
             ensemble_type=ensemble_data.ensemble_type,
+            musicians=musicians,
         )
         session.add(ensemble)
         session.commit()
@@ -37,9 +39,11 @@ def add_ensemble(ensemble_data: EnsembleSchema):
 @router.put('/ensembles/{id}')
 def update_ensemble(id: int, ensemble_data: EnsembleSchema):
     with db_helper.session_maker() as session:
+        musicians = session.query(Musician).filter(Musician.id.in_(ensemble_data.musicians_id)).all()
         ensemble = session.query(Ensemble).filter_by(id=id).first()
         for key, value in ensemble_data.model_dump().items():
-            setattr(ensemble, key, value)
+            if key != 'musicians_id': setattr(ensemble, key, value)
+        ensemble.musicians = musicians
         session.commit()
         session.refresh(ensemble)
         return ensemble
