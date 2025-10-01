@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from authx import RequestToken
 from ..database import db_helper
 from ..models import Musician
 from ..schemas import MusicianSchema
+from ..auth import auth
 
 
 router = APIRouter(tags=['musicians'])
@@ -21,8 +23,12 @@ def get_musician(id: int):
         return musician
 
 
-@router.post('/musicians/', status_code=201)
-def add_musician(musician_data: MusicianSchema):
+@router.post('/musicians/', status_code=201, dependencies=[Depends(auth.get_token_from_request)])
+def add_musician(musician_data: MusicianSchema, token: RequestToken = Depends()):
+    try:
+        auth.verify_token(token=token)
+    except Exception as e:
+        raise HTTPException(401, detail={"message": str(e)}) from e
     with db_helper.session_maker() as session:
         musician = Musician(
             name=musician_data.name,
@@ -34,8 +40,12 @@ def add_musician(musician_data: MusicianSchema):
         return musician.id
 
 
-@router.put('/musicians/{id}')
-def update_musician(id: int, musician_data: MusicianSchema):
+@router.put('/musicians/{id}', dependencies=[Depends(auth.get_token_from_request)])
+def update_musician(id: int, musician_data: MusicianSchema, token: RequestToken = Depends()):
+    try:
+        auth.verify_token(token=token)
+    except Exception as e:
+        raise HTTPException(401, detail={"message": str(e)}) from e
     with db_helper.session_maker() as session:
         musician = session.query(Musician).filter_by(id=id).first()
         for key, value in musician_data.model_dump().items():
@@ -45,8 +55,12 @@ def update_musician(id: int, musician_data: MusicianSchema):
         return musician
 
 
-@router.delete('/musicians/{id}/')
-def delete_musician(id: int):
+@router.delete('/musicians/{id}/', dependencies=[Depends(auth.get_token_from_request)])
+def delete_musician(id: int, token: RequestToken = Depends()):
+    try:
+        auth.verify_token(token=token)
+    except Exception as e:
+        raise HTTPException(401, detail={"message": str(e)}) from e
     with db_helper.session_maker() as session:
         session.query(Musician).filter_by(id=id).delete()
         session.commit()

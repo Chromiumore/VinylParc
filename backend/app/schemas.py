@@ -1,6 +1,6 @@
 from typing import Optional, List
 from datetime import date
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, SecretStr
 from .models import MusicianType, EnsembleType
 
 
@@ -20,6 +20,7 @@ class RecordSchema(BaseModel):
 
 
 class RecordResponse(BaseModel):
+    id: int
     company: str
     wholesale_company_address: str
     retail_price: float
@@ -86,3 +87,24 @@ class PerformanceResponse(BaseModel):
     performance_date: date
     composition_id: int
     ensemble_id: int
+
+
+# Авторизация
+# class RegisterSchema(BaseModel):
+#     username: str
+#     password: SecretStr
+#     email: EmailStr
+
+
+class LoginSchema(BaseModel):
+    email: EmailStr
+    password: SecretStr
+
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+
+    class Config:
+        from_attributes = True
+

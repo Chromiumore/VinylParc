@@ -1,9 +1,11 @@
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from authx import RequestToken
 from sqlalchemy.orm import selectinload
 from ..database import db_helper
 from ..models import Ensemble, Musician
 from ..schemas import EnsembleSchema, EnsembleResponse
+from ..auth import auth
 
 
 router = APIRouter(tags=['ensembles'])
@@ -23,8 +25,12 @@ def get_ensemble(id: int):
         return ensemble
 
 
-@router.post('/ensembles/', status_code=201)
-def add_ensemble(ensemble_data: EnsembleSchema):
+@router.post('/ensembles/', status_code=201, dependencies=[Depends(auth.get_token_from_request)])
+def add_ensemble(ensemble_data: EnsembleSchema, token: RequestToken = Depends()):
+    try:
+        auth.verify_token(token=token)
+    except Exception as e:
+        raise HTTPException(401, detail={"message": str(e)}) from e
     with db_helper.session_maker() as session:
         musicians = session.query(Musician).filter(Musician.id.in_(ensemble_data.musicians_id)).all()
         ensemble = Ensemble(
@@ -38,8 +44,12 @@ def add_ensemble(ensemble_data: EnsembleSchema):
         return ensemble.id
     
 
-@router.put('/ensembles/{id}', response_model=EnsembleResponse)
-def update_ensemble(id: int, ensemble_data: EnsembleSchema):
+@router.put('/ensembles/{id}', response_model=EnsembleResponse, dependencies=[Depends(auth.get_token_from_request)])
+def update_ensemble(id: int, ensemble_data: EnsembleSchema, token: RequestToken = Depends()):
+    try:
+        auth.verify_token(token=token)
+    except Exception as e:
+        raise HTTPException(401, detail={"message": str(e)}) from e
     with db_helper.session_maker() as session:
         musicians = session.query(Musician).filter(Musician.id.in_(ensemble_data.musicians_id)).all()
         ensemble = session.query(Ensemble).options(selectinload(Ensemble.musicians)).filter_by(id=id).first()
@@ -51,8 +61,12 @@ def update_ensemble(id: int, ensemble_data: EnsembleSchema):
         return ensemble
     
 
-@router.delete('/ensembles/{id}/')
-def delete_ensemble(id: int):
+@router.delete('/ensembles/{id}/', dependencies=[Depends(auth.get_token_from_request)])
+def delete_ensemble(id: int, token: RequestToken = Depends()):
+    try:
+        auth.verify_token(token=token)
+    except Exception as e:
+        raise HTTPException(401, detail={"message": str(e)}) from e
     with db_helper.session_maker() as session:
         session.query(Ensemble).filter_by(id=id).delete()
         session.commit()
