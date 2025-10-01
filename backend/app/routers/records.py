@@ -49,7 +49,7 @@ def update_record(id: int, record_data: RecordSchema):
     
 
 @router.delete('/records/{id}/')
-def delete_record(id:int):
+def delete_record(id: int):
     with db_helper.session_maker() as session:
-        record = session.query(Record).filter_by(id=id).delete()
+        session.query(Record).filter_by(id=id).delete()
         session.commit()

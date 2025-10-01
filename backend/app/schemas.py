@@ -13,3 +13,8 @@ class RecordSchema(BaseModel):
     current_year_sold: int
     last_year_sold: int
     remaining_stock: int
+
+
+class CompositionSchema(BaseModel):
+    name: str
+    about: str
