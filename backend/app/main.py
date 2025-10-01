@@ -1,8 +1,5 @@
 from fastapi import FastAPI
-from .database import db_helper
+from .records import router as records_router
 
 app = FastAPI()
-
-@app.get('/')
-def root_test():
-    return {'message': 'Hello World'}
+app.include_router(records_router)
