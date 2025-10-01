@@ -3,7 +3,9 @@ from ..database import db_helper
 from ..models import Record
 from ..schemas import RecordSchema
 
-router = APIRouter()
+
+router = APIRouter(tags=['records'])
+
 
 @router.get('/records')
 def get_all_records():

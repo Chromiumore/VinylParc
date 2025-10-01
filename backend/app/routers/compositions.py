@@ -3,7 +3,8 @@ from ..database import db_helper
 from ..models import Composition
 from ..schemas import CompositionSchema
 
-router = APIRouter()
+
+router = APIRouter(tags=['compositions'])
 
 
 @router.get('/compositions')
