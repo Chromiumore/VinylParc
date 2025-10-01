@@ -106,3 +106,13 @@ class Record(Base):
     remaining_stock: Mapped[int] = mapped_column(Integer, default=0)
 
     performances: Mapped[List[Performance]] = relationship(secondary=performance_record)
+
+
+# Модели для авторизации
+class User(Base):
+    '''Пользователь системы'''
+    __tablename__ = 'users'
+
+    username: Mapped[str] = mapped_column(String, unique=True)
+    password_hash: Mapped[str] = mapped_column(String(256))
+    email: Mapped[str] = mapped_column(String, unique=True)
