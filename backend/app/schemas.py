@@ -1,5 +1,7 @@
+from typing import Optional
 from datetime import date
 from pydantic import BaseModel
+from .models import MusicianType
 
 
 class RecordSchema(BaseModel):
@@ -18,3 +20,9 @@ class RecordSchema(BaseModel):
 class CompositionSchema(BaseModel):
     name: str
     about: str
+
+
+class MusicianSchema(BaseModel):
+    name: str
+    about: Optional[str]
+    musician_type: MusicianType
