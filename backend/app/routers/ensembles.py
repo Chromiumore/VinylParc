@@ -1,23 +1,25 @@
+from typing import List
 from fastapi import APIRouter
+from sqlalchemy.orm import selectinload
 from ..database import db_helper
 from ..models import Ensemble, Musician
-from ..schemas import EnsembleSchema
+from ..schemas import EnsembleSchema, EnsembleResponse
 
 
 router = APIRouter(tags=['ensembles'])
 
 
-@router.get('/ensembles')
+@router.get('/ensembles', response_model=List[EnsembleResponse])
 def get_all_ensembles():
     with db_helper.session_maker() as session:
-        ensembles = session.query(Ensemble).all()
+        ensembles = session.query(Ensemble).options(selectinload(Ensemble.musicians)).all()
         return ensembles
 
 
-@router.get('/ensembles/{id}')
+@router.get('/ensembles/{id}', response_model=EnsembleResponse)
 def get_ensemble(id: int):
     with db_helper.session_maker() as session:
-        ensemble = session.query(Ensemble).filter_by(id=id).first()
+        ensemble = session.query(Ensemble).options(selectinload(Ensemble.musicians)).filter_by(id=id).first()
         return ensemble
 
 
@@ -36,11 +38,11 @@ def add_ensemble(ensemble_data: EnsembleSchema):
         return ensemble.id
     
 
-@router.put('/ensembles/{id}')
+@router.put('/ensembles/{id}', response_model=EnsembleResponse)
 def update_ensemble(id: int, ensemble_data: EnsembleSchema):
     with db_helper.session_maker() as session:
         musicians = session.query(Musician).filter(Musician.id.in_(ensemble_data.musicians_id)).all()
-        ensemble = session.query(Ensemble).filter_by(id=id).first()
+        ensemble = session.query(Ensemble).options(selectinload(Ensemble.musicians)).filter_by(id=id).first()
         for key, value in ensemble_data.model_dump().items():
             if key != 'musicians_id': setattr(ensemble, key, value)
         ensemble.musicians = musicians
