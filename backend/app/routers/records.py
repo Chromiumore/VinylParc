@@ -1,23 +1,25 @@
+from typing import List
 from fastapi import APIRouter
+from sqlalchemy.orm import selectinload
 from ..database import db_helper
 from ..models import Record, Performance
-from ..schemas import RecordSchema
+from ..schemas import RecordSchema, RecordResponse
 
 
 router = APIRouter(tags=['records'])
 
 
-@router.get('/records')
+@router.get('/records', response_model=List[RecordResponse])
 def get_all_records():
     with db_helper.session_maker() as session:
-        records = session.query(Record).all()
+        records = session.query(Record).options(selectinload(Record.performances)).all()
         return records
     
 
-@router.get('/records/{id}')
+@router.get('/records/{id}', response_model=RecordResponse)
 def get_record(id: int):
     with db_helper.session_maker() as session:
-        record = session.query(Record).filter_by(id=id).first()
+        record = session.query(Record).options(selectinload(Record.performances)).filter_by(id=id).first()
         return record
 
 
@@ -41,11 +43,11 @@ def add_record(record_data: RecordSchema):
         return record.id
     
 
-@router.put('/records/{id}')
+@router.put('/records/{id}', response_model=RecordResponse)
 def update_record(id: int, record_data: RecordSchema):
     with db_helper.session_maker() as session:
         performances = session.query(Performance).filter(Performance.id.in_(record_data.performances_id)).all()
-        record = session.query(Record).filter_by(id=id).first()
+        record = session.query(Record).options(selectinload(Record.performances)).filter_by(id=id).first()
         for key, value in record_data.model_dump().items():
             if key != 'performances_id': setattr(record, key, value)
         record.performances = performances
