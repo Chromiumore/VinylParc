@@ -1,28 +1,10 @@
-# from PySide6.QtWidgets import QMainWindow, QTabWidget
-# from catalog_view import CatalogView
-# from sales_view import SalesView
-# from users_view import UsersView
-
-# class MainWindow(QMainWindow):
-#     def __init__(self, role):
-#         super().__init__()
-#         self.setWindowTitle("VinylParc")
-#         self.resize(900, 600)
-
-#         tabs = QTabWidget()
-#         tabs.addTab(CatalogView(), "Каталог")
-
-#         if role in ("employee", "admin"):
-#             tabs.addTab(SalesView(), "Продажи")
-
-#         if role == "admin":
-#             tabs.addTab(UsersView(), "Пользователи")
-
-#         self.setCentralWidget(tabs)
-
+# main_window.py
 from PySide6.QtWidgets import QMainWindow, QTabWidget, QWidget, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
-from catalog_view import CatalogView
-from users_view import UsersView
+from records_view import RecordsView
+from musicians_view import MusiciansView
+from ensembles_view import EnsemblesView
+from compositions_view import CompositionsView
+from performances_view import PerformancesView
 from api import logout
 
 class MainWindow(QMainWindow):
@@ -31,7 +13,7 @@ class MainWindow(QMainWindow):
         self.role = role
         self.username = username
         self.setWindowTitle(f"VinylParc — {username} ({role})")
-        self.resize(1000, 650)
+        self.resize(1100, 700)
 
         central = QWidget()
         main_layout = QVBoxLayout()
@@ -41,7 +23,6 @@ class MainWindow(QMainWindow):
         header.addWidget(self.lbl_user)
         header.addStretch()
 
-        # Logout button visible только если роль не гость
         if self.role != "guest":
             self.btn_logout = QPushButton("Выйти")
             self.btn_logout.clicked.connect(self.handle_logout)
@@ -50,15 +31,26 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(header)
 
         self.tabs = QTabWidget()
-        # Каталог всегда
-        self.catalog_tab = CatalogView(role=self.role)
-        self.tabs.addTab(self.catalog_tab, "Каталог")
 
-        # Для сотрудников/админов каталог поддерживает CRUD — в CatalogView это учитывается по роли
-        if self.role == "admin":
-            # Таблица пользователей только для админа
-            self.users_tab = UsersView()
-            self.tabs.addTab(self.users_tab, "Пользователи")
+        # Records (catalog)
+        self.records_tab = RecordsView(role=self.role)
+        self.tabs.addTab(self.records_tab, "Records")
+
+        # Musicians
+        self.musicians_tab = MusiciansView(role=self.role)
+        self.tabs.addTab(self.musicians_tab, "Musicians")
+
+        # Ensembles
+        self.ensembles_tab = EnsemblesView(role=self.role)
+        self.tabs.addTab(self.ensembles_tab, "Ensembles")
+
+        # Compositions
+        self.compositions_tab = CompositionsView(role=self.role)
+        self.tabs.addTab(self.compositions_tab, "Compositions")
+
+        # Performances
+        self.performances_tab = PerformancesView(role=self.role)
+        self.tabs.addTab(self.performances_tab, "Performances")
 
         main_layout.addWidget(self.tabs)
         central.setLayout(main_layout)
