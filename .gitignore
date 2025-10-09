@@ -205,3 +205,31 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+=======
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# VS Code
+.vscode/
+
+# system files
+.DS_Store
+Thumbs.db
+
+# Logs / DB / secrets
+*.log
+*.sqlite
+*.db
+.env
+*.pem
+*.key
+
+# Local client config / cache (не добавляем в репозиторий)
+.vinylparc_client.json
