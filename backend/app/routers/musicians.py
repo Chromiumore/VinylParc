@@ -23,12 +23,8 @@ def get_musician(id: int):
         return musician
 
 
-@router.post('/musicians/', status_code=201, dependencies=[Depends(auth.get_token_from_request)])
-def add_musician(musician_data: MusicianSchema, token: RequestToken = Depends()):
-    try:
-        auth.verify_token(token=token)
-    except Exception as e:
-        raise HTTPException(401, detail={"message": str(e)}) from e
+@router.post('/musicians/', status_code=201)
+def add_musician(musician_data: MusicianSchema):
     with db_helper.session_maker() as session:
         musician = Musician(
             name=musician_data.name,
@@ -40,12 +36,8 @@ def add_musician(musician_data: MusicianSchema, token: RequestToken = Depends())
         return musician.id
 
 
-@router.put('/musicians/{id}', dependencies=[Depends(auth.get_token_from_request)])
-def update_musician(id: int, musician_data: MusicianSchema, token: RequestToken = Depends()):
-    try:
-        auth.verify_token(token=token)
-    except Exception as e:
-        raise HTTPException(401, detail={"message": str(e)}) from e
+@router.put('/musicians/{id}')
+def update_musician(id: int, musician_data: MusicianSchema):
     with db_helper.session_maker() as session:
         musician = session.query(Musician).filter_by(id=id).first()
         for key, value in musician_data.model_dump().items():
@@ -55,12 +47,8 @@ def update_musician(id: int, musician_data: MusicianSchema, token: RequestToken 
         return musician
 
 
-@router.delete('/musicians/{id}/', dependencies=[Depends(auth.get_token_from_request)])
-def delete_musician(id: int, token: RequestToken = Depends()):
-    try:
-        auth.verify_token(token=token)
-    except Exception as e:
-        raise HTTPException(401, detail={"message": str(e)}) from e
+@router.delete('/musicians/{id}/')
+def delete_musician(id: int):
     with db_helper.session_maker() as session:
         session.query(Musician).filter_by(id=id).delete()
         session.commit()
