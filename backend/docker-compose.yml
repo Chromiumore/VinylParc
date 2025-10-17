@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    working_dir: /backend
+    ports:
+      - "8000:8000"
+    command: uvicorn app.main:create_app --host 0.0.0.0 --port 8000 --factory
+    depends_on:
+      - postgres
+    volumes:
+      - ./alembic.ini:/backend/alembic.ini
+      - ./app/alembic:/backend/app/alembic
+
+  postgres:
+    image: postgres:17-alpine
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}q
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+
+volumes:
+  db_data:
