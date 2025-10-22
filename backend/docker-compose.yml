@@ -1,29 +1,38 @@
+name: vinyl-parc
+
 services:
   backend:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file: .env
-    working_dir: /backend
+    working_dir: /vinyl/backend
+    env_file: ./.env
     ports:
       - "8000:8000"
-    command: uvicorn app.main:create_app --host 0.0.0.0 --port 8000 --factory
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
-      - ./alembic.ini:/backend/alembic.ini
-      - ./app/alembic:/backend/app/alembic
+      - ./alembic.ini:/vinyl/backend/alembic.ini
+      - ./app/alembic:/vinyl/backend/app/alembic
 
   postgres:
     image: postgres:17-alpine
     env_file:
       - ./.env
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}q
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 
 volumes:

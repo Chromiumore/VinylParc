@@ -6,11 +6,11 @@ RUN apt-get update && \
     python3-dev \
     gcc
 
-WORKDIR /backend
+WORKDIR /vinyl/backend
 
-COPY requirements.txt /backend/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /backend/requirements.txt
+COPY requirements.txt /vinyl/backend/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./* /backend
+COPY . /vinyl/backend
 
 CMD ["uvicorn", "app.main:create_app", "--host", "0.0.0.0", "--port", "8000"]
