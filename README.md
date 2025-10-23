@@ -29,3 +29,5 @@
 
 3. Применить миграции к бд с запущенным контейнером
 > docker exec -it vinyl-parc-backend-1 alembic upgrade head
+
+![Прикол](https://i.pinimg.com/736x/aa/78/66/aa78667a89d0a8bfee78e43251107b4a.jpg)
