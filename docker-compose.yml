@@ -5,7 +5,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: vynilparc/vynil-parc-backend:latest
+    image: vinylparc/vinyl-parc-backend:latest
     working_dir: /vinyl/backend
     env_file: .env.compose
     ports:
