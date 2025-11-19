@@ -1,4 +1,4 @@
-name: vinyl-parc
+name: vinyl-parc-backend
 
 services:
   backend:
