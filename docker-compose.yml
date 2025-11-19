@@ -1,4 +1,4 @@
-name: vinyl-parc
+name: vinyl-parc-${BUILD_NUMBER}
 
 services:
   backend:
