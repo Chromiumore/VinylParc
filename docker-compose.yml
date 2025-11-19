@@ -1,3 +1,5 @@
+name: vinyl-parc-backend
+
 services:
   backend:
     build:
