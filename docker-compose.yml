@@ -2,31 +2,23 @@ name: vinyl-parc-backend
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
     image: vinylparc/vinyl-parc-backend:latest
-    working_dir: /vinyl/backend
-    env_file: .env.compose
     ports:
       - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
     depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./backend/alembic.ini:/vinyl/backend/alembic.ini
-      - ./backend/app/alembic:/vinyl/backend/app/alembic
+      - postgres
+    restart: unless-stopped
 
   postgres:
     image: postgres:17-alpine
-    env_file:
-      - .env.compose
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -34,7 +26,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+    restart: unless-stopped
 
 volumes:
   db_data:
