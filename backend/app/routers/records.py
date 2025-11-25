@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import selectinload
-from authx import RequestToken
+#from authx import RequestToken
 from ..database import db_helper
 from ..models import Record, Performance
 from ..schemas import RecordSchema, RecordResponse
@@ -25,12 +25,8 @@ def get_record(id: int):
         return record
 
 
-@router.post('/records/', status_code=201, dependencies=[Depends(auth.get_token_from_request)])
-def add_record(record_data: RecordSchema, token: RequestToken = Depends()):
-    try:
-        auth.verify_token(token=token)
-    except Exception as e:
-        raise HTTPException(401, detail={"message": str(e)}) from e
+@router.post('/records/', status_code=201)
+def add_record(record_data: RecordSchema):
     with db_helper.session_maker() as session:
         performances = session.query(Performance).filter(Performance.id.in_(record_data.performances_id)).all()
         record = Record(
@@ -49,12 +45,8 @@ def add_record(record_data: RecordSchema, token: RequestToken = Depends()):
         return record.id
     
 
-@router.put('/records/{id}', response_model=RecordResponse, dependencies=[Depends(auth.get_token_from_request)])
-def update_record(id: int, record_data: RecordSchema, token: RequestToken = Depends()):
-    try:
-        auth.verify_token(token=token)
-    except Exception as e:
-        raise HTTPException(401, detail={"message": str(e)}) from e
+@router.put('/records/{id}', response_model=RecordResponse)
+def update_record(id: int, record_data: RecordSchema):
     with db_helper.session_maker() as session:
         performances = session.query(Performance).filter(Performance.id.in_(record_data.performances_id)).all()
         record = session.query(Record).options(selectinload(Record.performances)).filter_by(id=id).first()
@@ -66,12 +58,8 @@ def update_record(id: int, record_data: RecordSchema, token: RequestToken = Depe
         return record
     
 
-@router.delete('/records/{id}/', dependencies=[Depends(auth.get_token_from_request)])
-def delete_record(id: int, token: RequestToken = Depends()):
-    try:
-        auth.verify_token(token=token)
-    except Exception as e:
-        raise HTTPException(401, detail={"message": str(e)}) from e
+@router.delete('/records/{id}/')
+def delete_record(id: int):
     with db_helper.session_maker() as session:
         session.query(Record).filter_by(id=id).delete()
         session.commit()

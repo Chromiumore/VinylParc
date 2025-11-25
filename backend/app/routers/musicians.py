@@ -11,6 +11,7 @@ router = APIRouter(tags=['musicians'])
 
 @router.get('/musicians')
 def get_all_musicians():
+    print("Getting all musicians")
     with db_helper.session_maker() as session:
         musicians = session.query(Musician).all()
         return musicians
@@ -18,17 +19,15 @@ def get_all_musicians():
 
 @router.get('/musicians/{id}')
 def get_musician(id: int):
+    print(f"Getting musician {id}")
     with db_helper.session_maker() as session:
         musician = session.query(Musician).filter_by(id=id).first()
         return musician
 
 
-@router.post('/musicians/', status_code=201, dependencies=[Depends(auth.get_token_from_request)])
-def add_musician(musician_data: MusicianSchema, token: RequestToken = Depends()):
-    try:
-        auth.verify_token(token=token)
-    except Exception as e:
-        raise HTTPException(401, detail={"message": str(e)}) from e
+@router.post('/musicians/', status_code=201)
+def add_musician(musician_data: MusicianSchema):
+    print("Adding musician")
     with db_helper.session_maker() as session:
         musician = Musician(
             name=musician_data.name,
@@ -40,12 +39,9 @@ def add_musician(musician_data: MusicianSchema, token: RequestToken = Depends())
         return musician.id
 
 
-@router.put('/musicians/{id}', dependencies=[Depends(auth.get_token_from_request)])
-def update_musician(id: int, musician_data: MusicianSchema, token: RequestToken = Depends()):
-    try:
-        auth.verify_token(token=token)
-    except Exception as e:
-        raise HTTPException(401, detail={"message": str(e)}) from e
+@router.put('/musicians/{id}')
+def update_musician(id: int, musician_data: MusicianSchema):
+    print(f"Updating musician {id}")
     with db_helper.session_maker() as session:
         musician = session.query(Musician).filter_by(id=id).first()
         for key, value in musician_data.model_dump().items():
@@ -55,12 +51,9 @@ def update_musician(id: int, musician_data: MusicianSchema, token: RequestToken 
         return musician
 
 
-@router.delete('/musicians/{id}/', dependencies=[Depends(auth.get_token_from_request)])
-def delete_musician(id: int, token: RequestToken = Depends()):
-    try:
-        auth.verify_token(token=token)
-    except Exception as e:
-        raise HTTPException(401, detail={"message": str(e)}) from e
+@router.delete('/musicians/{id}/')
+def delete_musician(id: int):
+    print(f"Deleting musician {id}")
     with db_helper.session_maker() as session:
         session.query(Musician).filter_by(id=id).delete()
         session.commit()
