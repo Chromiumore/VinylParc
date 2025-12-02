@@ -1,6 +1,7 @@
 from hashlib import sha256
 from authx import AuthX, AuthXConfig, RequestToken, TokenPayload
 from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
 from .config import Config
 from .schemas import LoginSchema
 from .database import db_helper
@@ -33,13 +34,12 @@ router = APIRouter(tags=['auth'])
 
 
 @router.post('/login')
-def login(creds: LoginSchema):
+def login(*, session: Session = Depends(db_helper.get_session), creds: LoginSchema):
     email = creds.email
     password = creds.password.get_secret_value()
-    with db_helper.session_maker() as session:
-        db_user = session.query(User).filter_by(email=email, password_hash=sha256(password.encode('utf-8')).hexdigest()).first()
-        if not db_user:
-            raise HTTPException(status_code=401, detail="Incorrect email or password")
-        token = auth.create_access_token(uid=str(db_user.id))
-        return {'access_token': token}
+    db_user = session.query(User).filter_by(email=email, password_hash=sha256(password.encode('utf-8')).hexdigest()).first()
+    if not db_user:
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
+    token = auth.create_access_token(uid=str(db_user.id))
+    return {'access_token': token}
 

@@ -11,6 +11,11 @@ class DatabaseHelper:
         self.engine = create_engine(url)
         self.session_maker = sessionmaker(bind=self.engine)
 
+    def get_session(self):
+        with self.session_maker() as session:
+            yield session
+
+
 
 db_helper = DatabaseHelper(
     config.db.get_db_url(),
