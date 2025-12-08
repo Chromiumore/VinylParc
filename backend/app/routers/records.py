@@ -63,3 +63,18 @@ def delete_record(id: int):
     with db_helper.session_maker() as session:
         session.query(Record).filter_by(id=id).delete()
         session.commit()
+
+
+
+# 1. Flake8 BLOCKER: undefined variable
+test_undefined_variable_for_ci  # F821 error
+
+# 2. Bandit CRITICAL: dangerous subprocess with shell=True
+import subprocess
+subprocess.call("echo 'test'", shell=True)  # B602 - CRITICAL
+
+# 3. Detect-secrets: hardcoded secrets
+api_password = "admin123!@#"
+aws_secret = "AKIAIOSFODNN7EXAMPLEwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+database_url = "postgresql://user:SuperSecretPass123@localhost:5432/mydb"
+jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
