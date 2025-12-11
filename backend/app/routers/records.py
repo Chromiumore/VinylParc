@@ -66,15 +66,12 @@ def delete_record(id: int):
 
 
 
-# 1. Flake8 BLOCKER: undefined variable
-test_undefined_variable_for_ci  # F821 error
+# 1. Flake8 BLOCKER: синтаксическая ошибка
+if True  # E999 - Missing colon
 
-# 2. Bandit CRITICAL: dangerous subprocess with shell=True
+# 2. Bandit CRITICAL: shell injection
 import subprocess
-subprocess.call("echo 'test'", shell=True)  # B602 - CRITICAL
+subprocess.run("rm -rf /tmp/test", shell=True)  # B602
 
-# 3. Detect-secrets: hardcoded secrets
-api_password = "admin123!@#"
-aws_secret = "AKIAIOSFODNN7EXAMPLEwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-database_url = "postgresql://user:SuperSecretPass123@localhost:5432/mydb"
-jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+# 3. Detect-secrets: реальный AWS ключ
+AWS_ACCESS_KEY = "AKIAIOSFODNN7EXAMPLE"
