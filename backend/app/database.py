@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 from .config import Config
 
-config = Config.load()  
+config = Config.load()
 
 
 class DatabaseHelper:
