@@ -1,6 +1,6 @@
 from typing import Optional, List
 from datetime import date
-from pydantic import BaseModel, EmailStr, SecretStr
+from pydantic import BaseModel, EmailStr, SecretStr, ConfigDict
 from .models import MusicianType, EnsembleType
 
 
@@ -105,6 +105,6 @@ class UserResponse(BaseModel):
     id: int
     username: str
 
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(
+        from_attributes = True,
+    )
