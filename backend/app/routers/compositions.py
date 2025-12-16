@@ -45,6 +45,5 @@ def update_composition(*, session: Session = Depends(db_helper.get_session), id:
 
 @router.delete('/compositions/{id}/')
 def delete_composition(*, session: Session = Depends(db_helper.get_session), id: int):
-    with db_helper.session_maker() as session:
-        session.query(Composition).filter_by(id=id).delete()
-        session.commit()
+    session.query(Composition).filter_by(id=id).delete()
+    session.commit()
