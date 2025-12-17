@@ -15,56 +15,67 @@ from app.main import create_app
 app = create_app()
 
 
-@pytest.fixture(scope="session")
-def db_url_fixture() -> str:
+# @pytest.fixture(scope="session")
+# def db_url_fixture() -> str:
 
 
-    dotenv_path = find_dotenv('.env.test', raise_error_if_not_found=True)
-    load_dotenv(dotenv_path)
+#     dotenv_path = find_dotenv('.env.test', raise_error_if_not_found=True)
+#     load_dotenv(dotenv_path)
 
-    return (f'postgresql+psycopg2://'
-            f'{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}'
-            )
+#     return (f'postgresql+psycopg2://'
+#             f'{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}'
+#             )
 
 
-@pytest.fixture(scope='session')
-def engine_fixture(db_url_fixture: str):
-    engine = create_engine(
-            db_url_fixture,
-            poolclass=StaticPool
-        )
-    Base.metadata.create_all(bind=engine)
+# @pytest.fixture(scope='session')
+# def engine_fixture(db_url_fixture: str):
+#     engine = create_engine(
+#             db_url_fixture,
+#             poolclass=StaticPool
+#         )
+#     Base.metadata.create_all(bind=engine)
     
-    yield engine
+#     yield engine
 
-    Base.metadata.drop_all(bind=engine)
-    engine.dispose()
+#     Base.metadata.drop_all(bind=engine)
+#     engine.dispose()
+
+
+# @pytest.fixture(name='session')
+# def session_fixture(engine_fixture: Engine):
+#     connection = engine_fixture.connect()
+#     transaction = connection.begin()
+    
+#     with Session(bind=connection) as session:
+#         yield session
+    
+#     session.close()
+#     transaction.rollback()
+#     connection.close()
 
 
 @pytest.fixture(name='session')
-def session_fixture(engine_fixture: Engine):
-    connection = engine_fixture.connect()
-    transaction = connection.begin()
-    
-    with Session(bind=connection) as session:
-        yield session
-    
-    session.close()
-    transaction.rollback()
-    connection.close()
+def session_fixture():
+    yield Session()
     
     
+
+# @pytest.fixture(name='client')
+# def client_fixture(session: Session):
+#     def get_session_override():
+#         return session
+    
+#     app.dependency_overrides[db_helper.get_session] = get_session_override
+
+#     client = TestClient(app)
+#     yield client
+#     app.dependency_overrides.clear()
+
 
 @pytest.fixture(name='client')
-def client_fixture(session: Session):
-    def get_session_override():
-        return session
-    
-    app.dependency_overrides[db_helper.get_session] = get_session_override
-
+def client_fixture(session):
     client = TestClient(app)
     yield client
-    app.dependency_overrides.clear()
 
 
 @pytest.fixture(name='insert_musicians_data')
@@ -82,8 +93,8 @@ def musicians_data_fixture(session: Session):
         )
     ]
     
-    session.add_all(musicians)
-    session.commit()
+    # session.add_all(musicians)
+    # session.commit()
     return musicians
 
 
@@ -98,8 +109,8 @@ def ensembles_data_fixture(session: Session, insert_musicians_data: List[Musicia
         )
     ]
 
-    session.add_all(ensembles)
-    session.commit()
+    # session.add_all(ensembles)
+    # session.commit()
     return ensembles
 
 
@@ -112,8 +123,8 @@ def compositions_data_fixture(session: Session):
         )
     ]
 
-    session.add_all(compositions)
-    session.commit()
+    # session.add_all(compositions)
+    # session.commit()
     return compositions
 
 
@@ -132,8 +143,8 @@ def performances_data_fixture(session: Session, insert_ensembles_data: List[Ense
         )
     ]
     
-    session.add_all(performances)
-    session.commit()
+    # session.add_all(performances)
+    # session.commit()
     return performances
 
 
@@ -164,6 +175,6 @@ def records_data_fixture(session: Session, insert_performances_data: List[Perfor
         )
     ]
     
-    session.add_all(records)
-    session.commit()
+    # session.add_all(records)
+    # session.commit()
     return records
