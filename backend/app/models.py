@@ -96,7 +96,7 @@ class Record(Base):
 
     company: Mapped[str] = mapped_column(String(100))
     wholesale_company_address: Mapped[str] = mapped_column(String(100))
-    retail_price: Mapped[float] = mapped_column(Float)
+    retail_price: Mapped[int] = mapped_column(Float)
     wholesale_price: Mapped[float] = mapped_column(Float)
     release_date: Mapped[date] = mapped_column(Date)
 

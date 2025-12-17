@@ -48,7 +48,7 @@ def test_record_calculated_fields():
     record = Record(
         company='Test',
         wholesale_company_address='Address',
-        retail_price=20.0,
+        retail_price=20.5,
         wholesale_price=12.0,
         release_date=date(2024, 1, 1),
         current_year_sold=1000,
@@ -56,5 +56,6 @@ def test_record_calculated_fields():
         remaining_stock=500
     )
     
-    assert record.retail_price == 20.0
+    assert isinstance(record.retail_price, int)
+    assert record.retail_price == 20.5
     assert record.wholesale_price == 12.0
